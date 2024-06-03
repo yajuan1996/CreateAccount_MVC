@@ -1,0 +1,138 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@model  webMVC.Models.MemberVM
+
+
+
+<div>
+
+
+    @using (Html.BeginForm("Update", "Member", FormMethod.Post))
+    {
+        @Html.HiddenFor(m => m.Id)
+        <div class="row">
+            <div class="col-md-1">
+                <label class="control-label">姓名：</label>
+            </div>
+
+            <div class="col-md-2">
+                @Html.TextBoxFor(m => m.Name)
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-1">
+                <label class="control-label">年齡：</label>
+            </div>
+
+            <div class="col-md-2">
+                @Html.TextBoxFor(m => m.Age)
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-1">
+                <label class="control-label">生日：</label>
+            </div>
+
+            <div class="col-md-2">
+                @Html.TextBoxFor(m => m.Birthday)
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                @if (Model==null)
+                {
+                    <button type="submit" class="btn btn-primary">建立帳號</button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-primary">修改帳號</button>
+                }
+            </div>
+        </div>
+
+    }
+    <br />
+
+    <div class="row">
+        <div class="text-success col-md-1">
+            @TempData["Message"]
+        </div>
+        <div class="text-danger col-md-1">
+            @TempData["Error"]
+        </div>
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-md-6">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>年齡</th>
+                        <th>生日</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(function () {
+
+        //隱藏表格
+        $('.table').css('display', 'none');
+
+        //取得人員資料
+        $.ajax({
+            url: '@Url.Action("GetMemberList", "Member")',
+            type: 'GET',
+            success: function (data) {
+                if(data.length!=0)
+                {
+                    //顯示表格
+                    $('.table').css('display', 'block');
+
+                    //逐筆資料加入表格
+                    var html = '';
+                    $.each(data, function (index, item) {
+                        html += '<tr>';
+                        html += '<td>' + item.Name + '</td>';
+                        html += '<td>' + item.Age + '</td>';
+                        html += '<td>' + item.Birthday + '</td>';
+                        html += '<td><a href="Member/Index/' + item.Id + '" class="btn btn-primary">修改</a> ';
+                        html += ' <a href="Member/Delete/' + item.Id + '" class="btn btn-danger">刪除</a></td>';
+                        html += '</tr>';
+                    });
+
+                    $('table tbody').html(html);
+                }
+                
+            },
+            error: function (xhr, status, error) {
+                $(".text-danger").text("取得帳號資料錯誤," + error);
+            }
+            
+        });
+
+
+        //日期選擇器
+        $('#Birthday').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+
+</script>
